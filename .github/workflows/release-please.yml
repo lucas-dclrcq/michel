@@ -15,5 +15,6 @@ jobs:
     steps:
       - uses: googleapis/release-please-action@v4
         with:
+          target-branch: main
           token: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
           release-type: rust
