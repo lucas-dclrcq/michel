@@ -28,8 +28,8 @@ pub fn next_bot_username() -> String {
 }
 
 pub struct SharedInfra {
-    _synapse_container: ContainerAsync<GenericImage>,
-    _postgres_container: ContainerAsync<Postgres>,
+    synapse_container: ContainerAsync<GenericImage>,
+    postgres_container: ContainerAsync<Postgres>,
     pub synapse_port: u16,
     pub postgres_port: u16,
     pub admin_access_token: String,
@@ -90,8 +90,8 @@ pub async fn get_shared_infra() -> &'static SharedInfra {
             pool.close().await;
 
             SharedInfra {
-                _synapse_container: synapse_container,
-                _postgres_container: postgres_container,
+                synapse_container,
+                postgres_container,
                 synapse_port,
                 postgres_port,
                 admin_access_token,
@@ -100,6 +100,13 @@ pub async fn get_shared_infra() -> &'static SharedInfra {
             }
         })
         .await
+}
+
+pub async fn stop_shared_infra() {
+    if let Some(infra) = SHARED_INFRA.get() {
+        let _ = infra.synapse_container.stop().await;
+        let _ = infra.postgres_container.stop().await;
+    }
 }
 
 #[derive(Debug, World)]
